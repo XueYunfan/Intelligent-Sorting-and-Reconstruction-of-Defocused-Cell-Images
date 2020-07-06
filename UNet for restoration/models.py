@@ -8,42 +8,10 @@ import tensorflow as tf
 
 class InstanceNormalization(Layer):
     """Instance normalization layer.
-    Normalize the activations of the previous layer at each step,
-    i.e. applies a transformation that maintains the mean activation
-    close to 0 and the activation standard deviation close to 1.
-    # Arguments
-        axis: Integer, the axis that should be normalized
-            (typically the features axis).
-            For instance, after a `Conv2D` layer with
-            `data_format="channels_first"`,
-            set `axis=1` in `InstanceNormalization`.
-            Setting `axis=None` will normalize all values in each
-            instance of the batch.
-            Axis 0 is the batch dimension. `axis` cannot be set to 0 to avoid errors.
-        epsilon: Small float added to variance to avoid dividing by zero.
-        center: If True, add offset of `beta` to normalized tensor.
-            If False, `beta` is ignored.
-        scale: If True, multiply by `gamma`.
-            If False, `gamma` is not used.
-            When the next layer is linear (also e.g. `nn.relu`),
-            this can be disabled since the scaling
-            will be done by the next layer.
-        beta_initializer: Initializer for the beta weight.
-        gamma_initializer: Initializer for the gamma weight.
-        beta_regularizer: Optional regularizer for the beta weight.
-        gamma_regularizer: Optional regularizer for the gamma weight.
-        beta_constraint: Optional constraint for the beta weight.
-        gamma_constraint: Optional constraint for the gamma weight.
-    # Input shape
-        Arbitrary. Use the keyword argument `input_shape`
-        (tuple of integers, does not include the samples axis)
-        when using this layer as the first layer in a Sequential model.
-    # Output shape
-        Same shape as input.
     # References
         - [Layer Normalization](https://arxiv.org/abs/1607.06450)
-        - [Instance Normalization: The Missing Ingredient for Fast Stylization](
-        https://arxiv.org/abs/1607.08022)
+        - [Instance Normalization: The Missing Ingredient for Fast Stylization](https://arxiv.org/abs/1607.08022)
+	- https://github.com/keras-team/keras-contrib/blob/master/keras_contrib/layers/normalization/instancenormalization.py
     """
     def __init__(self,
                  axis=None,
