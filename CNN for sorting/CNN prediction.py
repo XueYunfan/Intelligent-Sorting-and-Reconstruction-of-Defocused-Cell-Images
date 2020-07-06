@@ -4,8 +4,9 @@ import random
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from tensorflow.keras.models import load_model
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_curve,auc,confusion_matrix
 
 TEST_PATH = 'XXX/'
 
@@ -42,8 +43,28 @@ test_dataset = test_dataset.batch(16)
 model_path = 'XXX.hdf5'
 model = load_model(model_path)
 predictions = model.predict(test_dataset)
-predictions = np.argmax(predictions, axis=1)
 
+def save_ROC(predictions):
+	
+	fpr, tpr, thresholds  =  roc_curve(test_labels, predictions[:,1], pos_label=1)
+	roc_auc = auc(fpr, tpr)
+	roc_auc = np.array([roc_auc])
+
+	data1 = pd.DataFrame(fpr)
+	data2 = pd.DataFrame(tpr)
+	data3 = pd.DataFrame(thresholds)
+	data4 = pd.DataFrame(roc_auc)
+
+	writer = pd.ExcelWriter('XXX.xlsx')
+	data1.to_excel(writer,startcol=0,index=False)
+	data2.to_excel(writer,startcol=1,index=False)
+	data3.to_excel(writer,startcol=2,index=False)
+	data4.to_excel(writer,startcol=3,index=False)
+	writer.save()
+
+save_ROC(predictions)
+
+predictions = np.argmax(predictions, axis=1)
 cm = confusion_matrix(test_labels, predictions)
 classes = ['Unfocused','Focused']
 
