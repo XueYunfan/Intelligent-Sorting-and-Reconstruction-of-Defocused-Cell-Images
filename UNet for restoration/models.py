@@ -127,8 +127,8 @@ def conv_block(input_tensor, filters):
 
 def residual_conv_block(input_tensor, filters):
 	
-	x = InstanceNormalization()(input_tensor)
-	x = Activation('relu')(x)
+	norm = InstanceNormalization()(input_tensor)
+	x = Activation('relu')(norm)
 	x = Conv2D(filters, 3, activation = None, padding = 'valid', 
 		kernel_initializer = initializers.he_normal(seed=1))(x)
 	x = InstanceNormalization()(x)
@@ -136,9 +136,7 @@ def residual_conv_block(input_tensor, filters):
 	x = Conv2D(filters, 3, activation = None, padding = 'valid', 
 		kernel_initializer = initializers.he_normal(seed=1))(x)
 	
-	y = Cropping2D(cropping=((2, 2), (2, 2)))(input_tensor)
-	y = InstanceNormalization()(y)
-	y = Activation('relu')(y)
+	y = Cropping2D(cropping=((2, 2), (2, 2)))(norm)
 	y = Conv2D(filters, 1, padding='same', activation = None, 
 		kernel_initializer = initializers.he_normal(seed=1))(y)
 	
@@ -149,14 +147,20 @@ def residual_conv_block(input_tensor, filters):
 def ResUnet(input_shape=(572,572,3)):
 	
 	input1 = Input(input_shape)
-	conv1_1 = Conv2D(64, 3, activation = None, padding = 'valid', 
+	x = Conv2D(64, 3, activation = None, padding = 'valid', 
 		kernel_initializer = initializers.he_normal(seed=1))(input1)
-	conv1_1 = InstanceNormalization()(conv1_1)
-	conv1_1 = Activation('relu')(conv1_1)
-	conv1_2 = Conv2D(64, 3, activation = None, padding = 'valid', 
-		kernel_initializer = initializers.he_normal(seed=1))(conv1_1)
-	pool1 = MaxPooling2D(pool_size=(2, 2))(conv1_2)
-	crop1 = Cropping2D(cropping=((88, 88), (88, 88)))(conv1_2)
+	x = InstanceNormalization()(x)
+	x = Activation('relu')(x)
+	x = Conv2D(64, 3, activation = None, padding = 'valid', 
+		kernel_initializer = initializers.he_normal(seed=1))(x)
+	
+	y = Cropping2D(cropping=((2, 2), (2, 2)))(input1)
+	y = Conv2D(64, 1, activation = None, padding = 'valid', 
+		kernel_initializer = initializers.he_normal(seed=1))(y)
+	
+	conv1 = add([x, y])
+	pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+	crop1 = Cropping2D(cropping=((88, 88), (88, 88)))(conv1)
 	
 	conv2 = residual_conv_block(pool1, 128)
 	pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
